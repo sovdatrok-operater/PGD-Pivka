@@ -1,0 +1,2004 @@
+<!DOCTYPE html>
+<html lang="sl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#C0392B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PGD Oprema">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Evidenca opreme PGD Pivka</title>
+<script src="https://unpkg.com/@zxing/library@0.19.1/umd/index.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Barlow+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --red: #C0392B;
+  --red-dark: #922b21;
+  --red-light: #f9ebea;
+  --yellow: #F4D03F;
+  --bg: #F5F4F0;
+  --surface: #FFFFFF;
+  --border: #E0DDD6;
+  --text: #1a1a18;
+  --muted: #7a7870;
+  --mono: 'DM Mono', monospace;
+  --head: 'Barlow Condensed', sans-serif;
+  --body: 'Barlow', sans-serif;
+  --radius: 6px;
+  --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.06);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: var(--body); background: var(--bg); color: var(--text); font-size: 15px; min-height: 100vh; }
+
+/* HEADER */
+.app-header {
+  background: var(--red);
+  color: white;
+  padding: 8px 16px;
+  padding-top: max(8px, env(safe-area-inset-top));
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 56px;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+.app-header h1 { font-family: var(--head); font-size: 20px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; }
+.app-header .subtitle { font-size: 11px; opacity: 0.8; font-family: var(--mono); }
+.header-actions { display: flex; gap: 8px; }
+.icon-btn {
+  background: rgba(255,255,255,0.15);
+  border: none;
+  border-radius: var(--radius);
+  color: white;
+  width: 36px; height: 36px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 18px;
+  transition: background 0.15s;
+}
+.icon-btn:hover { background: rgba(255,255,255,0.25); }
+
+/* NAV TABS */
+.nav-scroll {
+  background: var(--surface);
+  border-bottom: 2px solid var(--border);
+  overflow-x: auto;
+  white-space: nowrap;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  position: sticky;
+  top: 56px;
+  z-index: 90;
+}
+.nav-scroll::-webkit-scrollbar { display: none; }
+.nav-tabs { display: inline-flex; padding: 0 8px; }
+.nav-tab {
+  padding: 12px 14px;
+  border: none;
+  background: none;
+  font-family: var(--head);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--muted);
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  margin-bottom: -2px;
+  white-space: nowrap;
+  transition: color 0.15s, border-color 0.15s;
+}
+.nav-tab.active { color: var(--red); border-bottom-color: var(--red); }
+.nav-tab .badge {
+  display: inline-block;
+  background: var(--red-light);
+  color: var(--red);
+  border-radius: 10px;
+  font-size: 10px;
+  padding: 1px 5px;
+  margin-left: 4px;
+  font-family: var(--mono);
+  vertical-align: middle;
+}
+.nav-tab.active .badge { background: var(--red); color: white; }
+
+/* CONTENT */
+.content { max-width: 760px; margin: 0 auto; padding: 16px; }
+
+/* GASILEC PAGE */
+.gasilec-view { display: none; }
+.gasilec-view.active { display: block; }
+
+.gasilec-header {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.gasilec-avatar {
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--red);
+  color: white;
+  font-family: var(--head);
+  font-size: 18px;
+  font-weight: 700;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+}
+.gasilec-info { flex: 1; }
+.gasilec-name { font-family: var(--head); font-size: 18px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+.gasilec-meta { font-size: 12px; color: var(--muted); font-family: var(--mono); margin-top: 2px; }
+
+.stats-row { display: flex; gap: 8px; margin-bottom: 14px; }
+.stat-card {
+  flex: 1;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 12px;
+  text-align: center;
+}
+.stat-num { font-family: var(--head); font-size: 22px; font-weight: 700; }
+.stat-lbl { font-size: 10px; color: var(--muted); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.5px; }
+.stat-card.warn .stat-num { color: #e67e22; }
+.stat-card.danger .stat-num { color: var(--red); }
+
+/* TOOLBAR */
+.toolbar { display: flex; gap: 8px; margin-bottom: 12px; }
+.search-box {
+  flex: 1;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--body);
+  font-size: 14px;
+  background: var(--surface);
+  color: var(--text);
+}
+.search-box:focus { outline: none; border-color: var(--red); }
+.btn {
+  padding: 9px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  color: var(--text);
+  cursor: pointer;
+  font-family: var(--body);
+  font-size: 13px;
+  display: inline-flex; align-items: center; gap: 6px;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+.btn:hover { background: var(--bg); }
+.btn-primary { background: var(--red); color: white; border-color: var(--red); }
+.btn-primary:hover { background: var(--red-dark); }
+.btn-icon { padding: 9px 10px; }
+
+/* EQUIPMENT TABLE / CARDS */
+.eq-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.eq-table th {
+  text-align: left;
+  padding: 8px 10px;
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  border-bottom: 1.5px solid var(--border);
+  background: var(--bg);
+}
+.eq-table td {
+  padding: 10px 10px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.eq-table tr:last-child td { border-bottom: none; }
+.eq-table tr:hover td { background: #faf9f6; }
+.eq-wrap {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  overflow-x: auto;
+}
+
+/* STATUS BADGES */
+.status {
+  display: inline-block;
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-family: var(--mono);
+  font-size: 10px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.s-ok { background: #eafbea; color: #1e8449; }
+.s-warn { background: #fef9e7; color: #b7770d; border: 1px solid #f9e79f; }
+.s-danger { background: var(--red-light); color: var(--red); border: 1px solid #f1948a; }
+.s-damaged { background: #f5eef8; color: #7d3c98; }
+.s-retired { background: #f2f3f4; color: #626567; }
+
+.item-name { font-weight: 500; }
+.item-id { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+
+/* FAB */
+.fab {
+  position: fixed;
+  bottom: 20px;
+  right: 16px;
+  width: 52px; height: 52px;
+  background: var(--red);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  font-size: 26px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 14px rgba(192,57,43,0.5);
+  z-index: 200;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.fab:hover { transform: scale(1.07); box-shadow: 0 6px 18px rgba(192,57,43,0.6); }
+
+/* MODAL */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 500;
+  align-items: flex-end;
+  justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+#modal-confirm { z-index: 600; }
+@media (min-width: 600px) { .modal-overlay { align-items: center; } }
+.modal {
+  background: var(--surface);
+  border-radius: 12px 12px 0 0;
+  padding: 20px 16px 32px;
+  width: 100%;
+  max-width: 520px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+@media (min-width: 600px) { .modal { border-radius: 12px; } }
+.modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 16px;
+}
+.modal-title { font-family: var(--head); font-size: 20px; font-weight: 700; text-transform: uppercase; }
+.modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--muted); padding: 4px; }
+.form-group { margin-bottom: 12px; }
+.form-label { display: block; font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--muted); margin-bottom: 5px; }
+.form-control {
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--body);
+  font-size: 14px;
+  background: var(--surface);
+  color: var(--text);
+}
+.form-control:focus { outline: none; border-color: var(--red); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.modal-actions { display: flex; gap: 8px; margin-top: 16px; }
+.modal-actions .btn { flex: 1; justify-content: center; }
+
+/* SCAN MODAL */
+.scan-area {
+  background: #000;
+  border-radius: var(--radius);
+  overflow: hidden;
+  position: relative;
+  margin-bottom: 12px;
+  min-height: 220px;
+  display: flex; align-items: center; justify-content: center;
+}
+#scan-video { width: 100%; display: block; }
+.scan-overlay {
+  position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  pointer-events: none;
+}
+.scan-frame {
+  width: 200px; height: 140px;
+  border: 2px solid var(--yellow);
+  border-radius: 4px;
+  box-shadow: 0 0 0 2000px rgba(0,0,0,0.4);
+}
+.scan-line {
+  position: absolute;
+  width: 196px;
+  height: 2px;
+  background: var(--yellow);
+  animation: scan 2s linear infinite;
+  top: calc(50% - 70px);
+}
+@keyframes scan {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(136px); }
+}
+.scan-result-box {
+  padding: 10px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  font-family: var(--mono);
+  font-size: 13px;
+  min-height: 38px;
+  color: var(--muted);
+}
+.scan-result-box.found { background: #eafbea; border-color: #a9dfbf; color: #1e8449; font-weight: 500; }
+.scan-result-box.notfound { background: var(--red-light); border-color: #f1948a; color: var(--red); }
+
+/* MANAGE GASILCI */
+.gasilec-list-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+}
+.gasilec-list-item:last-child { border-bottom: none; }
+
+/* NOTES TEXTAREA */
+textarea.form-control { resize: vertical; min-height: 70px; font-family: var(--body); }
+
+/* EMPTY STATE */
+.empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 13px;
+}
+.empty .big { font-size: 36px; margin-bottom: 8px; }
+
+/* DETAIL VIEW */
+.detail-section { margin-bottom: 16px; }
+.detail-label { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: 0.8px; color: var(--muted); margin-bottom: 3px; }
+.detail-value { font-size: 15px; font-weight: 500; }
+
+/* OVERVIEW TAB */
+.overview-card-body { display: none; border-top: 1px solid var(--border); }
+.overview-card-body.open { display: block; }
+
+.overview-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.overview-card-header {
+  padding: 10px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg);
+  cursor: pointer;
+}
+.overview-card-body { padding: 10px 14px; }
+
+/* ALERTS */
+.alert {
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  margin-bottom: 8px;
+  font-size: 13px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+.alert-warn { background: #fef9e7; border-left: 3px solid #f39c12; color: #6e2f0a; }
+.alert-danger { background: var(--red-light); border-left: 3px solid var(--red); color: var(--red-dark); }
+
+/* MOBILE ADJUSTMENTS */
+@media (max-width: 540px) {
+  .eq-table { display: none; }
+  .eq-cards { display: block; }
+  .content { padding: 10px; }
+}
+@media (min-width: 541px) {
+  .eq-cards { display: none; }
+}
+.eq-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 14px;
+  margin-bottom: 8px;
+  box-shadow: var(--shadow);
+}
+.eq-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 6px; }
+.eq-card-name { font-weight: 500; font-size: 15px; }
+.eq-card-meta { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 14px; font-size: 12px; color: var(--muted); }
+.eq-card-meta span { display: flex; flex-direction: column; }
+.eq-card-meta strong { color: var(--text); font-size: 13px; font-weight: 500; }
+.eq-card-actions { display: flex; gap: 6px; margin-top: 10px; }
+.eq-card-actions .btn { flex: 1; justify-content: center; font-size: 12px; padding: 7px 10px; }
+
+/* CATEGORY VIEW */
+.kat-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-bottom: 10px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+}
+.kat-card-header {
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.kat-card-header:hover { background: #faf9f6; }
+.kat-card-name { font-family: var(--head); font-size: 17px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.3px; }
+.kat-card-summary { display: flex; gap: 12px; align-items: center; }
+.kat-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px;
+  border-radius: 12px;
+  font-family: var(--mono);
+  font-size: 11px;
+  font-weight: 500;
+}
+.kat-pill-zadolzeno { background: #E6F1FB; color: #185FA5; }
+.kat-pill-rezerva { background: #EAF3DE; color: #3B6D11; }
+.kat-pill-skupaj { background: var(--bg); color: var(--muted); border: 1px solid var(--border); }
+.kat-body { display: none; border-top: 1px solid var(--border); }
+.kat-body.open { display: block; }
+.kat-body-inner { padding: 12px 16px; }
+.kat-gasilec-row {
+  display: flex; align-items: center; gap: 10px;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.kat-gasilec-row:last-child { border-bottom: none; }
+.kat-reserve-edit { font-size: 12px; color: var(--red); cursor: pointer; text-decoration: underline; background:none; border:none; font-family: var(--body); padding:0; }
+/* OVERVIEW SEARCH */
+.overview-search { margin-bottom: 14px; }
+.overview-search .search-box { width: 100%; }
+
+
+@media (max-width: 600px) {
+  .app-header h1 { font-size: 17px; }
+  .header-actions { width: 100%; display: grid !important; grid-template-columns: repeat(4, 1fr); }
+  .header-actions .icon-btn { width: 100% !important; font-size: 12px !important; padding: 0 4px !important; }
+  #sync-status { grid-column: 1 / -1; order: 5; }
+  .nav-scroll { top: 0; position: relative; }
+  .fab { bottom: max(20px, env(safe-area-inset-bottom)); }
+  .kat-card-header { flex-direction: column; align-items: flex-start; gap: 8px; }
+  .kat-card-summary { flex-wrap: wrap; gap: 6px; }
+  .overview-card-header { flex-wrap: wrap; gap: 6px; }
+}
+.s-insp { background: #fef9e7; color: #b7770d; border: 1px dashed #f0b429; }
+details.alerts-box { background: var(--surface); border:1px solid var(--border); border-radius: var(--radius); margin-bottom:14px; }
+details.alerts-box summary { padding: 10px 14px; cursor:pointer; font-weight:500; font-size:14px; }
+details.alerts-box .alerts-inner { padding: 0 10px 10px; max-height: 340px; overflow-y:auto; }
+@media (max-width: 600px) {
+  .form-control, .search-box { font-size: 16px; }
+  .form-row { grid-template-columns: 1fr; gap: 0; }
+}
+.detail-actions { display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; margin-top:14px; }
+.detail-actions .btn { justify-content:center; font-size:12px; padding:9px 6px; white-space:normal; text-align:center; }
+.chip { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:16px; border:1px solid var(--border); background:var(--surface); font-size:13px; cursor:pointer; font-family:var(--body); color:var(--text); }
+.chip.on { background: var(--red); border-color: var(--red); color:#fff; }
+.check-row { display:flex; align-items:center; gap:8px; font-size:13px; padding:8px 10px; background:#EAF3DE; border-radius:var(--radius); color:#27500A; margin-bottom:12px; }
+.check-row input { width:18px; height:18px; }
+#print-area { display:none; }
+@page { size: A4; margin: 10mm; }
+@media print {
+  html, body { background: #fff !important; }
+  body > *:not(#print-area) { display:none !important; }
+  #print-area { display:block !important; font-family: Arial, sans-serif; color:#000; }
+  #print-area table { width:100%; border-collapse:collapse; font-size:12px; }
+  #print-area th, #print-area td { border:1px solid #000; padding:5px 6px; text-align:left; }
+  #print-area h2 { font-size:16px; margin:0 0 4px; }
+  .print-page { page-break-after: always; padding: 10mm 6mm; }
+  .print-page:last-child { page-break-after: auto; }
+  .sign-row { display:flex; justify-content:space-between; margin-top:36px; font-size:12px; }
+  .sign-row div { width:45%; border-top:1px solid #000; padding-top:4px; }
+}
+.loading-overlay { position:fixed; inset:0; background:rgba(245,244,240,0.85); display:flex; align-items:center; justify-content:center; z-index:900; font-family:var(--mono); font-size:14px; }
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div>
+    <h1>Evidenca opreme PGD Pivka</h1>
+    <div class="subtitle">Osebna oprema · Zadolžitve</div>
+  </div>
+  <div class="header-actions" style="display:flex;align-items:center;gap:6px">
+    <span id="sync-status" style="font-size:11px;color:rgba(255,255,255,0.85);font-family:var(--mono);transition:opacity 1s;opacity:0;white-space:nowrap"></span>
+    <button class="icon-btn" onclick="openScanModal()" title="Skeniraj črtno kodo" style="width:auto;padding:0 10px;font-size:13px;gap:5px;font-family:var(--body)">📷 Skeniraj</button>
+    <button class="icon-btn" onclick="openManageModal()" title="Upravljaj gasilce" style="width:auto;padding:0 10px;font-size:13px;gap:5px;font-family:var(--body)">👥 Gasilci</button>
+    <button class="icon-btn" onclick="showExportImport()" title="Izvoz / Uvoz" style="width:auto;padding:0 10px;font-size:13px;gap:5px;font-family:var(--body)">⬆️ Izvoz</button>
+    <button class="icon-btn" onclick="openUrlModal()" title="Nastavi oblak" style="width:auto;padding:0 10px;font-size:13px;gap:5px;font-family:var(--body)">☁️ Oblak</button>
+  </div>
+</header>
+
+<nav class="nav-scroll">
+  <div class="nav-tabs" id="nav-tabs">
+    <button class="nav-tab active" data-tab="overview" onclick="switchTab('overview',this)">Pregled po osebah</button>
+    <button class="nav-tab" data-tab="kategorije" onclick="switchTab('kategorije',this)">Po kategorijah</button>
+  </div>
+</nav>
+
+<div class="content">
+  <!-- OVERVIEW TAB -->
+  <div id="view-overview" class="gasilec-view active">
+    <div id="overview-content"></div>
+  </div>
+  <!-- KATEGORIJE TAB -->
+  <div id="view-kategorije" class="gasilec-view">
+    <div id="kategorije-content"></div>
+  </div>
+</div>
+
+<button class="fab" onclick="openAddModal()" title="Dodaj opremo" style="width:auto;border-radius:28px;padding:0 20px;font-size:15px;font-family:var(--body);font-weight:500;letter-spacing:0.3px">+ Dodaj opremo</button>
+
+<!-- ADD/EDIT MODAL -->
+<div class="modal-overlay" id="modal-add">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="add-modal-title">Dodaj opremo</span>
+      <button class="modal-close" onclick="closeModal('modal-add')">✕</button>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Gasilec</label>
+      <select class="form-control" id="f-gasilec-sel"></select>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Naziv opreme</label>
+        <select class="form-control" id="f-naziv-sel" onchange="handleNazivChange(true)"></select>
+      </div>
+      <div class="form-group" id="custom-naziv-wrap" style="display:none">
+        <label class="form-label">Vnesi naziv</label>
+        <input class="form-control" id="f-naziv-custom" placeholder="npr. Pozivnik" oninput="updateStockRow()">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Model</label>
+        <input class="form-control" id="f-model" placeholder="npr. Fire Surviver">
+      </div>
+      <div class="form-group">
+        <label class="form-label">ID / Črtna koda</label>
+        <div style="display:flex;gap:6px">
+          <input class="form-control" id="f-idst" placeholder="npr. 22052949" style="flex:1">
+          <button class="btn btn-icon" onclick="openScanIntoField()" title="Skeniraj">📷</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Datum nakupa / dodelitve</label>
+        <input type="date" class="form-control" id="f-datum">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Življenska doba (leta)</label>
+        <input type="number" class="form-control" id="f-zivljenje" placeholder="10" min="1" max="50">
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">Datum zadnjega pregleda</label>
+        <input type="date" class="form-control" id="f-pregled">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Stanje opreme</label>
+        <select class="form-control" id="f-stanje">
+          <option value="ok">✅ Dobro</option>
+          <option value="damaged">⚠️ Poškodovano</option>
+          <option value="retired">🚫 Izločeno</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label">Vrednost (€)</label>
+      <input type="number" class="form-control" id="f-vrednost" placeholder="0">
+    </div>
+
+    <label class="check-row" id="from-stock-row" style="display:none">
+      <input type="checkbox" id="f-from-stock" checked>
+      <span id="from-stock-lbl">Izdano iz zaloge</span>
+    </label>
+
+    <div class="form-group">
+      <label class="form-label">Opombe</label>
+      <textarea class="form-control" id="f-opombe" placeholder="Npr. manjka pas, potrebno servisiranje..."></textarea>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modal-add')">Prekliči</button>
+      <button class="btn btn-primary" onclick="saveItem()">💾 Shrani</button>
+    </div>
+  </div>
+</div>
+
+<!-- SCAN MODAL -->
+<div class="modal-overlay" id="modal-scan">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Skeniraj črtno kodo</span>
+      <button class="modal-close" onclick="stopScan()">✕</button>
+    </div>
+    <div class="scan-area">
+      <video id="scan-video" playsinline></video>
+      <div class="scan-overlay">
+        <div class="scan-frame"></div>
+        <div class="scan-line"></div>
+      </div>
+    </div>
+    <div class="scan-result-box" id="scan-result">Usmeri kamero v črtno kodo...</div>
+    <div style="display:flex;gap:6px;margin-top:10px">
+      <input class="form-control" id="scan-manual" placeholder="ali vpiši kodo ročno" inputmode="numeric" onkeydown="if(event.key==='Enter')manualScan()" style="flex:1">
+      <button class="btn btn-primary" onclick="manualScan()">Išči</button>
+    </div>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px;font-family:var(--mono)">Ko najde kodo, se samodejno odpre kartica ali vnese v polje.</p>
+    <div class="modal-actions" style="margin-top:12px">
+      <button class="btn btn-primary" onclick="stopScan()" style="flex:1;justify-content:center">Zapri</button>
+    </div>
+  </div>
+</div>
+
+<!-- MANAGE GASILCI MODAL -->
+<div class="modal-overlay" id="modal-manage">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Gasilci</span>
+      <button class="modal-close" onclick="closeModal('modal-manage')">✕</button>
+    </div>
+    <div style="display:flex;gap:8px;margin-bottom:12px">
+      <input class="form-control" id="new-gasilec-name" placeholder="Priimek Ime" style="flex:1" onkeydown="if(event.key==='Enter')addGasilec()">
+      <button class="btn btn-primary" onclick="addGasilec()">+ Dodaj</button>
+    </div>
+    <div class="eq-wrap" id="gasilec-list"></div>
+    <p style="font-size:11px;color:var(--muted);margin-top:10px;font-family:var(--mono)">Gasilca najdeš v zavihku Pregled po osebah. Klik na ✏️ preimenuje, 🗑️ izbriše.</p>
+  </div>
+</div>
+
+<!-- EXPORT/IMPORT MODAL -->
+<div class="modal-overlay" id="modal-export">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Izvoz / Uvoz</span>
+      <button class="modal-close" onclick="closeModal('modal-export')">✕</button>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:16px">Ko je nastavljen ☁️ Oblak, se podatki samodejno delijo med napravami. Tukaj lahko narediš varnostno kopijo, izvoz za Excel ali uvoziš obstoječo Excel evidenco.</p>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <button class="btn btn-primary" onclick="exportJSON()" style="justify-content:center">⬇️ Varnostna kopija (JSON)</button>
+      <button class="btn btn-primary" onclick="exportCSVAll()" style="justify-content:center;background:#1e8449;border-color:#1e8449">📊 Izvozi vse v CSV (Excel)</button>
+      <label class="btn" style="justify-content:center;cursor:pointer;border-color:#1e8449;color:#1e8449;font-weight:500">
+        📥 Uvozi obstoječo Excel evidenco (.xlsx)
+        <input type="file" accept=".xlsx,.xls" onchange="importExcel(event)" style="display:none">
+      </label>
+      <p style="font-size:11px;color:var(--muted);font-family:var(--mono);margin:-4px 0 4px">En zavihek = en gasilec (kot »Evidenca opreme.xlsx«). Obstoječi podatki ostanejo, podvojeni ID-ji se preskočijo.</p>
+      <label class="btn" style="justify-content:center;cursor:pointer">
+        ⬆️ Obnovi varnostno kopijo (JSON)
+        <input type="file" accept=".json" onchange="importJSON(event)" style="display:none">
+      </label>
+    </div>
+    <div id="export-msg" style="margin-top:10px;font-size:13px;color:var(--muted)"></div>
+  </div>
+</div>
+
+<!-- ITEM DETAIL MODAL -->
+<div class="modal-overlay" id="modal-detail">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="detail-title">Oprema</span>
+      <button class="modal-close" onclick="closeModal('modal-detail')">✕</button>
+    </div>
+    <div id="detail-body"></div>
+    <div class="modal-actions" style="margin-top:16px">
+      <button class="btn" onclick="closeModal('modal-detail')">Zapri</button>
+      <button class="btn btn-primary" onclick="editCurrentItem()">✏️ Uredi</button>
+    </div>
+  </div>
+</div>
+
+
+<!-- RESERVE MODAL -->
+<div class="modal-overlay" id="modal-reserve">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title" id="reserve-modal-title">Rezervna zaloga</span>
+      <button class="modal-close" onclick="closeModal('modal-reserve')">✕</button>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Vpiši trenutno število kosov v rezervni zalogi za to kategorijo opreme.</p>
+    <div class="form-group">
+      <label class="form-label">Število kosov v zalogi</label>
+      <input type="number" class="form-control" id="f-reserve-qty" min="0" placeholder="0">
+    </div>
+    <input type="hidden" id="f-reserve-naziv">
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modal-reserve')">Prekliči</button>
+      <button class="btn btn-primary" onclick="saveReserve()">💾 Shrani</button>
+    </div>
+  </div>
+</div>
+
+<script>
+
+// ============ CLOUD CONFIG ============
+// Sem prilepi tvoj Apps Script URL po objavi:
+let SCRIPT_URL = '';
+let CLOUD_TOKEN = '';
+try { SCRIPT_URL = localStorage.getItem('pgd_script_url') || ''; CLOUD_TOKEN = localStorage.getItem('pgd_token') || ''; } catch(e) {}
+
+function isCloudEnabled() { return SCRIPT_URL && SCRIPT_URL.startsWith('https://'); }
+
+// ============ CLOUD SYNC ============
+// Vsaka sprememba se pošlje kot posamezna operacija (ne prepiše celotne baze).
+// Če ni povezave, se operacije shranijo v čakalno vrsto in pošljejo kasneje.
+let pendingOps = [];
+try { pendingOps = JSON.parse(localStorage.getItem('pgd_pending_ops') || '[]'); } catch(e) { pendingOps = []; }
+let flushing = false;
+
+function savePending() { try { localStorage.setItem('pgd_pending_ops', JSON.stringify(pendingOps)); } catch(e){} }
+
+function cloudOp(op) {
+  if (!isCloudEnabled()) return;
+  pendingOps.push(op);
+  savePending();
+  flushOps();
+}
+
+async function flushOps() {
+  if (flushing || !isCloudEnabled() || !pendingOps.length) return;
+  flushing = true;
+  showSyncStatus('⏳ Shranjujem...');
+  try {
+    while (pendingOps.length) {
+      const res = await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(Object.assign({ token: CLOUD_TOKEN }, pendingOps[0])) });
+      const data = await res.json();
+      if (!data.ok) {
+        if (/geslo/i.test(data.error || '')) { showSyncStatus('🔒 Napačno geslo – preveri ☁️ Oblak'); flushing = false; return; }
+        throw new Error(data.error || 'Napaka');
+      }
+      pendingOps.shift();
+      savePending();
+    }
+    showSyncStatus('✅ Shranjeno v oblak');
+  } catch(e) {
+    showSyncStatus('⚠️ Brez povezave – ' + pendingOps.length + ' sprememb čaka');
+  }
+  flushing = false;
+}
+
+function normalizeRow(o) {
+  return Object.assign({}, o, {
+    zivljenje: parseInt(o.zivljenje) || 10,
+    vrednost: parseFloat(o.vrednost) || 0,
+    stanje: o.stanje || 'ok'
+  });
+}
+
+async function cloudLoad() {
+  if (!isCloudEnabled()) return false;
+  await flushOps();
+  if (pendingOps.length) return false; // ne prepiši lokalnih neposlanih sprememb
+  showSyncStatus('⏳ Nalagam iz oblaka...');
+  try {
+    const res = await fetch(SCRIPT_URL + '?action=load&token=' + encodeURIComponent(CLOUD_TOKEN) + '&t=' + Date.now());
+    const data = await res.json();
+    if (!data.ok) { showSyncStatus('❌ ' + (data.error || 'Napaka')); return false; }
+    db.gasilci = data.gasilci || [];
+    db.items   = (data.items || []).map(normalizeRow);
+    db.reserve = data.reserve || {};
+    saveDB();
+    showSyncStatus('✅ Sinhronizirano');
+    return true;
+  } catch(e) {
+    showSyncStatus('⚠️ Ni povezave – prikazani lokalni podatki');
+    return false;
+  }
+}
+
+async function refreshFromCloud() {
+  const ok = await cloudLoad();
+  if (ok) { buildTabs(); refreshActive(); }
+}
+
+function refreshActive() {
+  const t = document.querySelector('.nav-tab.active')?.dataset.tab || 'overview';
+  if (t === 'kategorije') renderKategorije(); else renderOverview(document.getElementById('overview-search')?.value || '');
+}
+
+// osveži, ko se uporabnik vrne v aplikacijo (npr. na telefonu)
+document.addEventListener('visibilitychange', () => { if (!document.hidden) refreshFromCloud(); });
+window.addEventListener('online', () => flushOps());
+
+function showSyncStatus(msg) {
+  let el = document.getElementById('sync-status');
+  if (!el) return;
+  el.textContent = msg;
+  el.style.opacity = '1';
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.style.opacity = '0'; }, 3000);
+}
+
+function openUrlModal() {
+  document.getElementById('f-script-url').value = SCRIPT_URL;
+  document.getElementById('f-token').value = CLOUD_TOKEN;
+  document.getElementById('modal-url').classList.add('open');
+}
+
+function saveScriptUrl() {
+  const url = document.getElementById('f-script-url').value.trim();
+  SCRIPT_URL = url;
+  CLOUD_TOKEN = document.getElementById('f-token').value.trim();
+  try { localStorage.setItem('pgd_script_url', url); localStorage.setItem('pgd_token', CLOUD_TOKEN); } catch(e) {}
+  closeModal('modal-url');
+  if (isCloudEnabled()) {
+    // prvi zagon z novim oblakom: če je oblak prazen, pošlji obstoječe lokalne podatke
+    fetch(SCRIPT_URL + '?action=load&token=' + encodeURIComponent(CLOUD_TOKEN) + '&t=' + Date.now()).then(r => r.json()).then(d => {
+      if (!d.ok) { showSyncStatus('❌ ' + (d.error || 'Napaka')); return; }
+      if (!(d.gasilci||[]).length && db.gasilci.length) {
+        cloudOp({ action: 'saveAll', data: db });
+      } else refreshFromCloud();
+    }).catch(() => showSyncStatus('❌ URL ne deluje – preveri uvedbo'));
+  }
+}
+
+// ============ DATA ============
+const ITEM_NAMES = [
+  'Intervencijska jakna','Intervencijske hlače','Intervencijske rokavice',
+  'Intervencijska čelada','Intervencijski čevlji','Podkapa',
+  'Kombinezon- GOZDNI','Čelada- GOZDNI','Čevlji-GOZDNI',
+  'Delovna obleka','Kratka majica','Svečana uniforma',
+  'Ročna postaja','Svetilka','Pozivnik','Dihalni aparat','Drugo'
+];
+
+let db = { gasilci: [], items: [] };
+let editItemId = null;
+let scanCallback = null;
+let codeReader = null;
+let scanStream = null;
+let currentDetailId = null;
+let onlyAlerts = false;
+
+function loadDB() {
+  try {
+    const s = localStorage.getItem('pgd_evidenca_v2');
+    if (s) db = JSON.parse(s);
+    if (!db.gasilci) db.gasilci = [];
+    if (!db.items) db.items = [];
+    if (!db.reserve) db.reserve = {};
+  } catch(e) { db = {gasilci:[], items:[], reserve:{}}; }
+}
+
+function saveDB() {
+  try { localStorage.setItem('pgd_evidenca_v2', JSON.stringify(db)); } catch(e) {}
+}
+
+// ============ TABS ============
+function buildTabs() {
+  const nav = document.getElementById('nav-tabs');
+  // remember which tab is active
+  const activeTab = document.querySelector('.nav-tab.active');
+  const activeId = activeTab ? activeTab.dataset.tab : 'overview';
+
+  nav.innerHTML = '<button class="nav-tab" data-tab="overview" onclick="switchTab(\'overview\',this)">Pregled po osebah</button>';
+  nav.innerHTML += '<button class="nav-tab" data-tab="kategorije" onclick="switchTab(\'kategorije\',this)">Pregled po kategorijah</button>';
+
+  db.gasilci.forEach(g => {
+    if (!document.getElementById('view-'+g.id)) {
+      const div = document.createElement('div');
+      div.id = 'view-'+g.id;
+      div.className = 'gasilec-view';
+      document.querySelector('.content').appendChild(div);
+    }
+  });
+
+  // ensure fixed views exist
+  if (!document.getElementById('view-overview')) {
+    const div = document.createElement('div');
+    div.id = 'view-overview';
+    div.className = 'gasilec-view';
+    document.querySelector('.content').appendChild(div);
+  }
+  if (!document.getElementById('view-kategorije')) {
+    const div = document.createElement('div');
+    div.id = 'view-kategorije';
+    div.className = 'gasilec-view';
+    document.querySelector('.content').appendChild(div);
+  }
+
+  // restore active tab
+  const btn = document.querySelector(`.nav-tab[data-tab="${activeId}"]`);
+  if (btn) btn.classList.add('active');
+  const view = document.getElementById('view-'+activeId);
+  if (view) view.classList.add('active');
+}
+
+function switchTab(id, btn) {
+  document.querySelectorAll('.gasilec-view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
+  const view = document.getElementById('view-'+id);
+  if (view) view.classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (id === 'overview') renderOverview();
+  else if (id === 'kategorije') renderKategorije();
+  else renderGasilec(id);
+  if (btn) btn.scrollIntoView({behavior:'smooth', inline:'nearest', block:'nearest'});
+}
+
+// slovenska dvojina/množina: 1 kos, 2 kosa, 3 kosi, 5 kosov
+function sl(n, f) {
+  const m = Math.abs(n) % 100;
+  return n + ' ' + (m === 1 ? f[0] : m === 2 ? f[1] : (m === 3 || m === 4) ? f[2] : f[3]);
+}
+const KOS = ['kos','kosa','kosi','kosov'];
+const OPOZ = ['opozorilo','opozorili','opozorila','opozoril'];
+const GAS = ['gasilec','gasilca','gasilci','gasilcev'];
+
+function todayStr() {
+  const d = new Date();
+  return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+}
+
+function initials(name) {
+  return name.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase();
+}
+
+// ============ STATUS ============
+function getExpiry(item) {
+  if (!item.datum || !item.zivljenje) return null;
+  const d = new Date(item.datum);
+  d.setFullYear(d.getFullYear() + parseInt(item.zivljenje));
+  return d;
+}
+
+function getStatus(item) {
+  const exp = getExpiry(item);
+  if (!exp) return 'ok';
+  const now = new Date();
+  const days = Math.floor((exp - now) / 86400000);
+  if (days < 0) return 'expired';
+  if (days < 365) return 'expiring';
+  return 'ok';
+}
+
+function inspectionOverdue(item) {
+  if (!item.pregled || item.stanje === 'retired') return false;
+  const d = new Date(item.pregled);
+  d.setFullYear(d.getFullYear() + 1);
+  return d < new Date();
+}
+
+function needsAttention(i) {
+  return i.stanje !== 'ok' || getStatus(i) !== 'ok' || inspectionOverdue(i);
+}
+
+function statusBadge(item) {
+  if (item.stanje === 'damaged') return '<span class="status s-damaged">Poškodovano</span>';
+  if (item.stanje === 'retired') return '<span class="status s-retired">Izločeno</span>';
+  const s = getStatus(item);
+  if (s === 'expired') return '<span class="status s-danger">Pretečeno</span>';
+  if (s === 'expiring') return '<span class="status s-warn">Kmalu poteče</span>';
+  if (inspectionOverdue(item)) return '<span class="status s-insp">Pregled zapadel</span>';
+  return '<span class="status s-ok">V redu</span>';
+}
+
+function fmtDate(d) {
+  if (!d) return '—';
+  return new Date(d).toLocaleDateString('sl-SI');
+}
+
+function fmtExpiry(item) {
+  const exp = getExpiry(item);
+  if (!exp) return '—';
+  return exp.toLocaleDateString('sl-SI');
+}
+
+// ============ OVERVIEW ============
+function renderOverview(searchQ) {
+  const q = (searchQ || '').toLowerCase();
+  const active = db.items.filter(i => i.stanje !== 'retired');
+  const total = active.length;
+  const expiring = active.filter(i => i.stanje === 'ok' && getStatus(i) === 'expiring').length;
+  const attention = active.filter(i => i.stanje === 'damaged' || getStatus(i) === 'expired' || inspectionOverdue(i)).length;
+
+  let html = `<div class="stats-row">
+    <div class="stat-card"><div class="stat-num">${db.gasilci.length}</div><div class="stat-lbl">Gasilci</div></div>
+    <div class="stat-card"><div class="stat-num">${total}</div><div class="stat-lbl">Kosi opreme</div></div>
+    <div class="stat-card warn"><div class="stat-num">${expiring}</div><div class="stat-lbl">Kmalu poteče</div></div>
+    <div class="stat-card danger"><div class="stat-num">${attention}</div><div class="stat-lbl">Pozornost</div></div>
+  </div>`;
+
+  // alerts
+  const alertItems = db.items.filter(i => needsAttention(i) && i.stanje !== 'retired');
+  if (alertItems.length) {
+    html += `<details class="alerts-box"><summary>⚠️ Opozorila (${alertItems.length})</summary><div class="alerts-inner">`;
+    alertItems.forEach(i => {
+      const g = db.gasilci.find(g => g.id === i.gid);
+      const cls = (getStatus(i) === 'expired' || i.stanje === 'retired') ? 'alert-danger' : 'alert-warn';
+      const icon = cls === 'alert-danger' ? '🔴' : '🟡';
+      html += `<div class="alert ${cls}" onclick="openDetail('${i.id}')" style="cursor:pointer">${icon} <div><strong>${esc(i.naziv)}</strong> — ${g ? esc(g.name) : '?'}<br><span style="font-size:11px;opacity:0.8">${statusBadge(i)} ${i.opombe ? '· '+esc(i.opombe) : ''}</span></div></div>`;
+    });
+    html += `</div></details>`;
+  }
+
+  // per gasilec summary
+  html += `<div class="overview-search"><input type="text" class="search-box" id="overview-search" placeholder="Išči po imenu gasilca..." oninput="renderOverviewFiltered()" value="${esc(searchQ||'')}"></div>`;
+  html += `<div style="font-family:var(--mono);font-size:11px;text-transform:uppercase;letter-spacing:0.8px;color:var(--muted);margin-bottom:8px">Po gasilcih</div>`;
+  html += `<div style="margin-bottom:10px"><button class="chip ${onlyAlerts?'on':''}" onclick="onlyAlerts=!onlyAlerts;renderOverviewFiltered()">⚠️ Samo z opozorili</button></div>`;
+  let filteredGasilci = q ? db.gasilci.filter(g => g.name.toLowerCase().includes(q)) : db.gasilci;
+  if (onlyAlerts) filteredGasilci = filteredGasilci.filter(g => db.items.some(i => i.gid === g.id && i.stanje !== 'retired' && needsAttention(i)));
+  filteredGasilci.forEach(g => {
+    const items = db.items.filter(i => i.gid === g.id);
+    const prob = items.filter(i => needsAttention(i) && i.stanje !== 'retired').length;
+    html += `<div class="overview-card">
+      <div class="overview-card-header" onclick="toggleOverviewCard(this, '${g.id}')">
+        <div style="display:flex;align-items:center;gap:10px">
+          <div class="gasilec-avatar" style="width:32px;height:32px;font-size:13px">${initials(g.name)}</div>
+          <span style="font-family:var(--head);font-size:16px;font-weight:700;text-transform:uppercase">${esc(g.name)}</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          ${prob ? `<span class="status s-warn">${sl(prob, OPOZ)}</span>` : '<span class="status s-ok">V redu</span>'}
+          <span style="color:var(--muted);font-family:var(--mono);font-size:12px">${sl(items.filter(i => i.stanje !== 'retired').length, KOS)}</span>
+          <span class="overview-card-arrow" style="color:var(--muted);font-size:18px;min-width:12px">›</span>
+        </div>
+      </div>
+      <div class="overview-card-body"></div>
+    </div>`;
+  });
+  if (filteredGasilci.length === 0 && (q || onlyAlerts) && db.gasilci.length) {
+    html += `<div class="empty"><div class="big">🔍</div>Ni zadetkov za iskanje.</div>`;
+  }
+
+  if (db.gasilci.length === 0) {
+    html += `<div class="empty"><div class="big">👥</div>Dodaj gasilce z gumbom 👥 Gasilci zgoraj.</div>`;
+  }
+
+  document.getElementById('view-overview').innerHTML = html;
+  if (searchQ !== undefined && searchQ !== '') {
+    const inp = document.getElementById('overview-search');
+    if (inp) { inp.focus(); inp.setSelectionRange(inp.value.length, inp.value.length); }
+  }
+}
+
+function esc(s) {
+  return String(s == null ? '' : s).replace(/[&<>"']/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+
+
+// ============ OVERVIEW SEARCH ============
+function renderOverviewFiltered() {
+  renderOverview(document.getElementById('overview-search')?.value || '');
+}
+
+// ============ KATEGORIJE ============
+function safeId(str) {
+  return str.split('').map(c => c.charCodeAt(0).toString(16)).join('');
+}
+
+function renderKategorije() {
+  // collect all unique item names across zadolžene items
+  const allNames = [...new Set(db.items.map(i => i.naziv))].sort();
+  
+  // also include names from ITEM_NAMES list that have reserve set
+  const reserve = db.reserve || {};
+  const allNamesWithReserve = [...new Set([...allNames, ...Object.keys(reserve)])].sort();
+
+  const skupaj = allNamesWithReserve.length;
+  let html = `<div class="stats-row">
+    <div class="stat-card"><div class="stat-num">${skupaj}</div><div class="stat-lbl">Kategorij opreme</div></div>
+    <div class="stat-card"><div class="stat-num">${db.items.filter(i => i.stanje !== 'retired').length}</div><div class="stat-lbl">Kosov v zadolžitvah</div></div>
+    <div class="stat-card"><div class="stat-num">${Object.values(reserve).reduce((s,v)=>s+v,0)}</div><div class="stat-lbl">Kosov v zalogi</div></div>
+  </div>`;
+
+  html += `<p style="font-size:12px;color:var(--muted);font-family:var(--mono);margin-bottom:12px">Klikni na kategorijo za seznam gasilcev · Zaloga = rezervni kosi, ki niso zadolženi posamezniku</p>`;
+
+  window._katNames = allNamesWithReserve;
+  allNamesWithReserve.forEach((naziv, ki) => {
+    const zadolzene = db.items.filter(i => i.naziv === naziv && i.stanje !== 'retired');
+    const rez = reserve[naziv] || 0;
+    const skupajKos = zadolzene.length + rez;
+    html += `<div class="kat-card">
+      <div class="kat-card-header" onclick="toggleKat(this, window._katNames[${ki}])">
+        <span class="kat-card-name">${esc(naziv)}</span>
+        <div class="kat-card-summary">
+          <span class="kat-pill kat-pill-zadolzeno">👤 Zadolženo: ${zadolzene.length}</span>
+          <span class="kat-pill kat-pill-rezerva">📦 Zaloga: ${rez}</span>
+          <span class="kat-pill kat-pill-skupaj">Skupaj: ${skupajKos}</span>
+          <span style="color:var(--muted);font-size:16px">›</span>
+        </div>
+      </div>
+      <div class="kat-body" id="kat-body-${safeId(naziv)}">
+        <div class="kat-body-inner">
+          ${zadolzene.length ? zadolzene.map(i => {
+            const g = db.gasilci.find(x => x.id === i.gid);
+            return `<div class="kat-gasilec-row" onclick="openDetail('${i.id}')" style="cursor:pointer">
+              <div class="gasilec-avatar" style="width:28px;height:28px;font-size:11px;flex-shrink:0">${initials(g?.name||'??')}</div>
+              <div style="flex:1"><span style="font-weight:500">${esc(g?.name||'?')}</span> <span style="color:var(--muted);font-size:11px;font-family:var(--mono)">${esc(i.model||'')} ${i.idst?'· '+esc(i.idst):''}</span></div>
+              ${statusBadge(i)}
+            </div>`;
+          }).join('') : '<div style="color:var(--muted);font-size:13px;padding:6px 0">Ni zadolženih kosov.</div>'}
+          <div style="margin-top:12px;padding-top:10px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+            <span style="font-size:13px;color:var(--muted)">📦 Rezervna zaloga: <strong style="color:var(--text)">${sl(rez, KOS)}</strong></span>
+            <button class="kat-reserve-edit" onclick="openReserveModal(window._katNames[${ki}], ${rez})">✏️ Uredi zalogo</button>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  });
+
+  if (!allNamesWithReserve.length) {
+    html += `<div class="empty"><div class="big">📦</div>Ni vnesene opreme. Dodaj opremo gasilcem.</div>`;
+  }
+
+  document.getElementById('view-kategorije').innerHTML = html;
+}
+
+function toggleKat(header, naziv) {
+  const bodyId = 'kat-body-' + safeId(naziv);
+  const body = document.getElementById(bodyId);
+  if (!body) return;
+  const isOpen = body.classList.contains('open');
+  // close all
+  document.querySelectorAll('.kat-body.open').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.kat-card-header span:last-child').forEach(s => { if(s.textContent==='‹') s.textContent='›'; });
+  if (!isOpen) {
+    body.classList.add('open');
+    header.querySelector('span:last-child').textContent = '‹';
+  }
+}
+
+function openReserveModal(naziv, current) {
+  document.getElementById('reserve-modal-title').textContent = naziv + ' — zaloga';
+  document.getElementById('f-reserve-naziv').value = naziv;
+  document.getElementById('f-reserve-qty').value = current;
+  document.getElementById('modal-reserve').classList.add('open');
+}
+
+function saveReserve() {
+  const naziv = document.getElementById('f-reserve-naziv').value;
+  const qty = parseInt(document.getElementById('f-reserve-qty').value) || 0;
+  if (!db.reserve) db.reserve = {};
+  setReserveQty(naziv, qty);
+  closeModal('modal-reserve');
+  renderKategorije();
+}
+
+function toggleOverviewCard(header, gid) {
+  const body = header.nextElementSibling;
+  if (!body) return;
+  const isOpen = body.classList.contains('open');
+  document.querySelectorAll('.overview-card-body').forEach(b => b.classList.remove('open'));
+  document.querySelectorAll('.overview-card-arrow').forEach(a => a.textContent = '›');
+  if (!isOpen) {
+    body.classList.add('open');
+    const arrow = header.querySelector('.overview-card-arrow');
+    if (arrow) arrow.textContent = '‹';
+    renderOverviewCardBody(body, gid);
+  }
+}
+
+function renderOverviewCardBody(body, gid) {
+  const items = db.items.filter(i => i.gid === gid);
+  if (!items.length) { body.innerHTML = `<div class="overview-card-body-inner" style="padding:10px 14px;font-size:13px;color:var(--muted)">Ni opreme.<div style="margin-top:8px"><button class="btn" onclick="openAddForGasilec('${gid}')" style="font-size:12px;padding:6px 10px">+ Dodaj opremo</button></div></div>`; return; }
+  let html = '<div class="overview-card-body-inner" style="padding:0 14px 12px">';
+  html += '<table style="width:100%;border-collapse:collapse;font-size:13px;margin-top:10px">';
+  html += '<thead><tr><th style="text-align:left;padding:6px 8px;font-size:10px;font-family:var(--mono);text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)">Naziv</th><th style="text-align:left;padding:6px 8px;font-size:10px;font-family:var(--mono);text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)">Model/ID</th><th style="padding:6px 8px;font-size:10px;font-family:var(--mono);text-transform:uppercase;color:var(--muted);border-bottom:1px solid var(--border)">Status</th></tr></thead><tbody>';
+  items.forEach(i => {
+    html += `<tr onclick="openDetail('${i.id}')" style="cursor:pointer">
+      <td style="padding:7px 8px;border-bottom:1px solid var(--border);font-weight:500">${esc(i.naziv)}</td>
+      <td style="padding:7px 8px;border-bottom:1px solid var(--border);color:var(--muted);font-size:12px;font-family:var(--mono)">${esc(i.model||'')} ${i.idst?'· '+esc(i.idst):''}</td>
+      <td style="padding:7px 8px;border-bottom:1px solid var(--border)">${statusBadge(i)}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  html += `<div style="margin-top:8px;display:flex;gap:6px"><button class="btn" onclick="openAddForGasilec('${gid}')" style="font-size:12px;padding:6px 10px">+ Dodaj opremo</button><button class="btn" onclick="exportGasilecCSV('${gid}')" style="font-size:12px;padding:6px 10px">📊 CSV</button><button class="btn" onclick="printZadolzitev(['${gid}'])" style="font-size:12px;padding:6px 10px">🖨️ Natisni zadolžitev</button></div>`;
+  html += '</div>';
+  body.innerHTML = html;
+}
+
+function switchTabByGid(gid) {
+  const btn = document.querySelector(`.nav-tab[data-tab="${gid}"]`);
+  switchTab(gid, btn);
+}
+
+// ============ GASILEC VIEW ============
+function renderGasilec(gid) {
+  const g = db.gasilci.find(x => x.id === gid);
+  if (!g) return;
+  const items = db.items.filter(i => i.gid === gid);
+  const ok = items.filter(i => getStatus(i) === 'ok' && i.stanje === 'ok').length;
+  const warn = items.filter(i => getStatus(i) === 'expiring' || i.stanje === 'damaged').length;
+  const danger = items.filter(i => getStatus(i) === 'expired' || i.stanje === 'retired').length;
+  const vrednost = items.reduce((s,i) => s+(parseFloat(i.vrednost)||0),0);
+
+  let html = `<div class="gasilec-header">
+    <div class="gasilec-avatar">${initials(g.name)}</div>
+    <div class="gasilec-info">
+      <div class="gasilec-name">${g.name}</div>
+      <div class="gasilec-meta">${sl(items.length, KOS)} · ${vrednost.toLocaleString('sl-SI')} € skupaj</div>
+    </div>
+    <button class="btn" onclick="openAddForGasilec('${gid}')" style="flex-shrink:0">+ Dodaj</button>
+  </div>
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" style="color:#1e8449">${ok}</div><div class="stat-lbl">V redu</div></div>
+    <div class="stat-card warn"><div class="stat-num">${warn}</div><div class="stat-lbl">Opozorilo</div></div>
+    <div class="stat-card danger"><div class="stat-num">${danger}</div><div class="stat-lbl">Kritično</div></div>
+  </div>`;
+
+  if (items.length === 0) {
+    html += `<div class="empty"><div class="big">📦</div>Ni vnesene opreme za tega gasilca.</div>`;
+  } else {
+    // DESKTOP TABLE
+    html += `<div class="eq-wrap"><table class="eq-table">
+      <thead><tr>
+        <th>Naziv</th><th>Model</th><th>ID</th><th>Dodeljeno</th><th>Poteče</th><th>Pregled</th><th>Stanje</th><th></th>
+      </tr></thead><tbody>`;
+    items.forEach(i => {
+      html += `<tr onclick="openDetail('${i.id}')" style="cursor:pointer">
+        <td class="item-name">${i.naziv}</td>
+        <td>${i.model||'—'}</td>
+        <td class="item-id">${i.idst||'—'}</td>
+        <td>${fmtDate(i.datum)}</td>
+        <td>${fmtExpiry(i)}</td>
+        <td>${fmtDate(i.pregled)}</td>
+        <td>${statusBadge(i)}</td>
+        <td><button class="btn btn-icon" onclick="event.stopPropagation();editItem('${i.id}')" style="padding:4px 8px;font-size:12px">✏️</button>
+            <button class="btn btn-icon" onclick="event.stopPropagation();deleteItem('${i.id}')" style="padding:4px 8px;font-size:12px">🗑️</button></td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+
+    // MOBILE CARDS
+    html += `<div class="eq-cards">`;
+    items.forEach(i => {
+      html += `<div class="eq-card">
+        <div class="eq-card-top">
+          <div class="eq-card-name">${i.naziv}</div>
+          ${statusBadge(i)}
+        </div>
+        <div class="eq-card-meta">
+          <span><strong>${i.model||'—'}</strong>Model</span>
+          <span><strong class="item-id">${i.idst||'—'}</strong>ID</span>
+          <span><strong>${fmtDate(i.datum)}</strong>Dodeljeno</span>
+          <span><strong>${fmtExpiry(i)}</strong>Poteče</span>
+        </div>
+        ${i.opombe ? `<div style="margin-top:8px;font-size:12px;color:var(--muted);background:var(--bg);padding:6px 8px;border-radius:4px">${i.opombe}</div>` : ''}
+        <div class="eq-card-actions">
+          <button class="btn" onclick="openDetail('${i.id}')">👁 Podrobnosti</button>
+          <button class="btn" onclick="editItem('${i.id}')">✏️ Uredi</button>
+          <button class="btn" onclick="deleteItem('${i.id}')">🗑️</button>
+        </div>
+      </div>`;
+    });
+    html += `</div>`;
+
+    // export for this gasilec
+    html += `<div style="margin-top:12px;display:flex;gap:8px">
+      <button class="btn" onclick="exportGasilecCSV('${gid}')" style="font-size:12px">📊 Izvozi v CSV</button>
+    </div>`;
+  }
+
+  document.getElementById('view-'+gid).innerHTML = html;
+}
+
+// ============ ADD/EDIT ============
+function populateNazivSelect() {
+  const sel = document.getElementById('f-naziv-sel');
+  sel.innerHTML = ITEM_NAMES.map(n => `<option value="${n}">${n}</option>`).join('');
+}
+
+function currentNaziv() {
+  const v = document.getElementById('f-naziv-sel').value;
+  return v === 'Drugo' ? document.getElementById('f-naziv-custom').value.trim() : v;
+}
+
+function handleNazivChange(userChanged) {
+  const v = document.getElementById('f-naziv-sel').value;
+  document.getElementById('custom-naziv-wrap').style.display = v === 'Drugo' ? 'block' : 'none';
+  // življenjska doba: prevzemi zadnjo vneseno za isto vrsto opreme
+  if (userChanged && !editItemId) {
+    const prev = [...db.items].reverse().find(i => i.naziv === currentNaziv() && i.zivljenje);
+    document.getElementById('f-zivljenje').value = prev ? prev.zivljenje : '';
+  }
+  updateStockRow();
+}
+
+function updateStockRow() {
+  const row = document.getElementById('from-stock-row');
+  const n = (db.reserve || {})[currentNaziv()] || 0;
+  if (!editItemId && n > 0) {
+    row.style.display = 'flex';
+    document.getElementById('from-stock-lbl').textContent = 'Izdano iz zaloge (na zalogi ' + sl(n, KOS) + ' → ostane ' + (n - 1) + ')';
+  } else row.style.display = 'none';
+}
+
+function populateGasilecSelect(selectedGid) {
+  const sel = document.getElementById('f-gasilec-sel');
+  sel.innerHTML = db.gasilci.map(g => `<option value="${g.id}" ${g.id===selectedGid?'selected':''}>${esc(g.name)}</option>`).join('');
+}
+
+function openAddModal() {
+  editItemId = null;
+  document.getElementById('add-modal-title').textContent = 'Dodaj opremo';
+  populateNazivSelect();
+  const activeTab = document.querySelector('.nav-tab.active');
+  const gid = activeTab?.dataset.tab;
+  populateGasilecSelect(gid && gid !== 'overview' ? gid : (db.gasilci[0]?.id || ''));
+  document.getElementById('f-model').value = '';
+  document.getElementById('f-idst').value = '';
+  document.getElementById('f-datum').value = todayStr();
+  document.getElementById('f-zivljenje').value = '';
+  document.getElementById('f-pregled').value = '';
+  document.getElementById('f-stanje').value = 'ok';
+  document.getElementById('f-vrednost').value = '';
+  document.getElementById('f-opombe').value = '';
+  document.getElementById('custom-naziv-wrap').style.display = 'none';
+  document.getElementById('f-naziv-custom').value = '';
+  document.getElementById('f-from-stock').checked = true;
+  handleNazivChange(true);
+  document.getElementById('modal-add').classList.add('open');
+}
+
+function openAddForGasilec(gid) {
+  openAddModal();
+  populateGasilecSelect(gid);
+}
+
+function editItem(id) {
+  const i = db.items.find(x => x.id === id);
+  if (!i) return;
+  editItemId = id;
+  currentDetailId = id;
+  document.getElementById('add-modal-title').textContent = 'Uredi opremo';
+  populateNazivSelect();
+  populateGasilecSelect(i.gid);
+  const inList = ITEM_NAMES.includes(i.naziv);
+  document.getElementById('f-naziv-sel').value = inList ? i.naziv : 'Drugo';
+  document.getElementById('custom-naziv-wrap').style.display = inList ? 'none' : 'block';
+  if (!inList) document.getElementById('f-naziv-custom').value = i.naziv;
+  document.getElementById('f-model').value = i.model||'';
+  document.getElementById('f-idst').value = i.idst||'';
+  document.getElementById('f-datum').value = i.datum||'';
+  document.getElementById('f-zivljenje').value = i.zivljenje||'';
+  document.getElementById('f-pregled').value = i.pregled||'';
+  document.getElementById('f-stanje').value = i.stanje||'ok';
+  document.getElementById('f-vrednost').value = i.vrednost||'';
+  document.getElementById('f-opombe').value = i.opombe||'';
+  updateStockRow();
+  closeModal('modal-detail');
+  document.getElementById('modal-add').classList.add('open');
+}
+
+function editCurrentItem() {
+  if (currentDetailId) editItem(currentDetailId);
+}
+
+function saveItem() {
+  const gid = document.getElementById('f-gasilec-sel').value;
+  let naziv = document.getElementById('f-naziv-sel').value;
+  if (naziv === 'Drugo') naziv = document.getElementById('f-naziv-custom').value.trim();
+  if (!naziv) return alert('Vnesi naziv opreme.');
+  if (!gid) return alert('Izberi gasilca.');
+  const idst = document.getElementById('f-idst').value.trim();
+  const dup = idst && db.items.find(i => i.idst === idst && i.id !== editItemId);
+  if (dup) {
+    const dg = db.gasilci.find(g => g.id === dup.gid);
+    return alert('ID ' + idst + ' je že vnesen: ' + dup.naziv + ' (' + (dg ? dg.name : '?') + ').');
+  }
+
+  const item = {
+    id: editItemId || ('i' + Date.now()),
+    gid,
+    naziv,
+    model: document.getElementById('f-model').value.trim(),
+    idst: document.getElementById('f-idst').value.trim(),
+    datum: document.getElementById('f-datum').value,
+    zivljenje: parseInt(document.getElementById('f-zivljenje').value) || 10,
+    pregled: document.getElementById('f-pregled').value,
+    stanje: document.getElementById('f-stanje').value,
+    vrednost: parseFloat(document.getElementById('f-vrednost').value) || 0,
+    opombe: document.getElementById('f-opombe').value.trim(),
+  };
+
+  if (editItemId) {
+    db.items = db.items.map(i => i.id === editItemId ? item : i);
+  } else {
+    db.items.push(item);
+    const n = (db.reserve || {})[naziv] || 0;
+    if (n > 0 && document.getElementById('f-from-stock').checked) setReserveQty(naziv, n - 1);
+  }
+  saveDB();
+  cloudOp({ action: 'upsert', table: 'items', row: item });
+  closeModal('modal-add');
+  buildTabs();
+  refreshActive();
+}
+
+function deleteItem(id) {
+  showConfirm('Izbriši ta kos opreme?', () => {
+    const i = db.items.find(x => x.id === id);
+    db.items = db.items.filter(x => x.id !== id);
+    saveDB();
+    cloudOp({ action: 'delete', table: 'items', id });
+    buildTabs();
+    closeModal('modal-detail');
+    refreshActive();
+  });
+}
+
+// ============ DETAIL ============
+function openDetail(id) {
+  const i = db.items.find(x => x.id === id);
+  if (!i) return;
+  currentDetailId = id;
+  const g = db.gasilci.find(x => x.id === i.gid);
+  document.getElementById('detail-title').textContent = i.naziv;
+  document.getElementById('detail-body').innerHTML = `
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px 16px;margin-bottom:12px">
+      <div class="detail-section"><div class="detail-label">Gasilec</div><div class="detail-value">${esc(g?.name||'?')}</div></div>
+      <div class="detail-section"><div class="detail-label">Model</div><div class="detail-value">${esc(i.model||'—')}</div></div>
+      <div class="detail-section"><div class="detail-label">ID / Črtna koda</div><div class="detail-value" style="font-family:var(--mono);font-size:13px">${esc(i.idst||'—')}</div></div>
+      <div class="detail-section"><div class="detail-label">Stanje</div><div class="detail-value">${statusBadge(i)}</div></div>
+      <div class="detail-section"><div class="detail-label">Datum dodelitve</div><div class="detail-value">${fmtDate(i.datum)}</div></div>
+      <div class="detail-section"><div class="detail-label">Datum poteka</div><div class="detail-value">${fmtExpiry(i)}</div></div>
+      <div class="detail-section"><div class="detail-label">Zadnji pregled</div><div class="detail-value">${fmtDate(i.pregled)}</div></div>
+      <div class="detail-section"><div class="detail-label">Vrednost</div><div class="detail-value">${i.vrednost ? i.vrednost.toLocaleString('sl-SI')+' €' : '—'}</div></div>
+    </div>
+    ${i.opombe ? `<div style="background:var(--bg);padding:10px 12px;border-radius:var(--radius);font-size:13px"><div class="detail-label" style="margin-bottom:4px">Opombe</div>${esc(i.opombe)}</div>` : ''}
+    <div class="detail-actions">
+      <button class="btn" onclick="markInspected('${i.id}')">✔ Pregledano danes</button>
+      <button class="btn" onclick="returnToStock('${i.id}')">↩ Vrni v zalogo</button>
+      <button class="btn" onclick="deleteItem('${i.id}')" style="color:var(--red)">🗑️ Izbriši</button>
+    </div>
+  `;
+  document.getElementById('modal-detail').classList.add('open');
+}
+
+// ============ GASILCI MANAGEMENT ============
+function renderGasilecList() {
+  const list = document.getElementById('gasilec-list');
+  if (!db.gasilci.length) { list.innerHTML = '<div class="empty" style="padding:20px">Ni gasilcev.</div>'; return; }
+  list.innerHTML = db.gasilci.map(g => {
+    const cnt = db.items.filter(i => i.gid === g.id).length;
+    return `<div class="gasilec-list-item">
+      <div class="gasilec-avatar" style="width:34px;height:34px;font-size:13px">${initials(g.name)}</div>
+      <div style="flex:1">
+        <div style="font-weight:500">${esc(g.name)}</div>
+        <div style="font-size:11px;color:var(--muted);font-family:var(--mono)">${sl(cnt, KOS)} opreme</div>
+      </div>
+      <button class="btn" onclick="openRename('${g.id}')" style="font-size:12px;padding:5px 8px" title="Preimenuj">✏️</button>
+      <button class="btn" onclick="removeGasilec('${g.id}')" style="font-size:12px;padding:5px 8px;color:var(--red)" title="Izbriši">🗑️</button>
+    </div>`;
+  }).join('');
+}
+
+function addGasilec() {
+  const name = document.getElementById('new-gasilec-name').value.trim().toUpperCase();
+  if (!name) return;
+  if (db.gasilci.find(g => g.name === name)) return alert('Gasilec že obstaja.');
+  const g = {id:'g'+Date.now(), name};
+  db.gasilci.push(g);
+  db.gasilci.sort((a,b) => a.name.localeCompare(b.name, 'sl'));
+  document.getElementById('new-gasilec-name').value = '';
+  saveDB();
+  cloudOp({ action: 'upsert', table: 'gasilci', row: g });
+  refreshActive();
+  buildTabs();
+  renderGasilecList();
+}
+
+function removeGasilec(id) {
+  const cnt = db.items.filter(i => i.gid === id).length;
+  const msg = cnt ? `Izbriši gasilca in ${sl(cnt, KOS)} opreme?` : 'Izbriši gasilca?';
+  showConfirm(msg, () => {
+    db.gasilci = db.gasilci.filter(g => g.id !== id);
+    db.items = db.items.filter(i => i.gid !== id);
+    saveDB();
+    cloudOp({ action: 'deleteGasilec', id });
+    buildTabs();
+    renderGasilecList();
+    renderOverview();
+    switchTab('overview', document.querySelector('.nav-tab[data-tab="overview"]'));
+  });
+}
+
+function openManageModal() {
+  renderGasilecList();
+  document.getElementById('modal-manage').classList.add('open');
+}
+
+// ============ SCAN ============
+function openScanModal(callback) {
+  scanCallback = callback || null;
+  document.getElementById('scan-result').className = 'scan-result-box';
+  document.getElementById('scan-result').textContent = 'Usmeri kamero v črtno kodo...';
+  document.getElementById('scan-manual').value = '';
+  document.getElementById('modal-scan').classList.add('open');
+  startScan();
+}
+
+function openScanIntoField() {
+  openScanModal((code) => {
+    document.getElementById('f-idst').value = code;
+  });
+}
+
+let scanHandled = false;
+
+async function startScan() {
+  scanHandled = false;
+  const box = document.getElementById('scan-result');
+  if (!window.isSecureContext) {
+    box.textContent = 'Kamera deluje samo prek https:// povezave (npr. objavljena stran). Kodo lahko vpišeš ročno.';
+    return;
+  }
+  if (typeof ZXing === 'undefined') {
+    box.textContent = 'Knjižnica za skeniranje se ni naložila – preveri internetno povezavo.';
+    return;
+  }
+  try {
+    codeReader = new ZXing.BrowserMultiFormatReader();
+    const video = document.getElementById('scan-video');
+    await codeReader.decodeFromConstraints(
+      { video: { facingMode: 'environment' } },
+      video,
+      (result) => {
+        if (result && !scanHandled) {
+          scanHandled = true;
+          if (navigator.vibrate) navigator.vibrate(80);
+          handleScanResult(result.getText().trim());
+        }
+      }
+    );
+  } catch(e) {
+    box.textContent = 'Kamera ni dostopna: ' + e.message + '. Dovoli dostop do kamere v nastavitvah brskalnika.';
+  }
+}
+
+function handleScanResult(code) {
+  if (scanCallback) {
+    const cb = scanCallback;
+    stopScan();
+    cb(code);
+    return;
+  }
+  const found = db.items.find(i => String(i.idst) === code);
+  const box = document.getElementById('scan-result');
+  if (found) {
+    box.className = 'scan-result-box found';
+    box.textContent = '✅ Najdeno: ' + found.naziv + ' (' + (db.gasilci.find(g=>g.id===found.gid)?.name||'?') + ')';
+    setTimeout(() => { stopScan(); openDetail(found.id); }, 700);
+  } else {
+    box.className = 'scan-result-box notfound';
+    box.textContent = '❌ ID ' + code + ' ni v bazi – odpiram vnos nove opreme.';
+    setTimeout(() => {
+      stopScan();
+      openAddModal();
+      document.getElementById('f-idst').value = code;
+    }, 1000);
+  }
+}
+
+function stopScan() {
+  if (codeReader) { try { codeReader.reset(); } catch(e){} codeReader = null; }
+  const video = document.getElementById('scan-video');
+  if (video && video.srcObject) { video.srcObject.getTracks().forEach(t => t.stop()); video.srcObject = null; }
+  document.getElementById('modal-scan').classList.remove('open');
+  scanCallback = null;
+}
+
+// ============ EXPORT/IMPORT ============
+function showExportImport() {
+  document.getElementById('export-msg').textContent = '';
+  document.getElementById('modal-export').classList.add('open');
+}
+
+function exportJSON() {
+  const blob = new Blob([JSON.stringify(db, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'pgd_evidenca_' + todayStr() + '.json';
+  a.click();
+}
+
+function importJSON(e) {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    try {
+      const data = JSON.parse(ev.target.result);
+      if (!data.gasilci || !data.items) throw new Error('Napačna oblika datoteke');
+      db = { gasilci: data.gasilci, items: data.items.map(normalizeRow), reserve: data.reserve || {} };
+      saveDB();
+      cloudOp({ action: 'saveAll', data: db });
+      buildTabs();
+      renderOverview();
+      document.getElementById('export-msg').textContent = '✅ Obnovljeno: ' + sl(db.gasilci.length, GAS) + ', ' + sl(db.items.length, KOS) + ' opreme.';
+      document.getElementById('export-msg').style.color = '#1e8449';
+    } catch(err) {
+      document.getElementById('export-msg').textContent = '❌ Napaka: ' + err.message;
+      document.getElementById('export-msg').style.color = 'var(--red)';
+    }
+  };
+  reader.readAsText(file);
+}
+
+function exportCSVAll() {
+  const headers = ['Gasilec','Naziv','Model','ID','Datum dodelitve','Poteče','Zadnji pregled','Stanje','Vrednost €','Opombe'];
+  const rows = db.items.map(i => {
+    const g = db.gasilci.find(x=>x.id===i.gid);
+    const exp = getExpiry(i);
+    return [
+      g?.name||'',i.naziv,i.model||'',i.idst||'',
+      i.datum||'',
+      exp ? exp.toISOString().split('T')[0] : '',
+      i.pregled||'',
+      i.stanje==='ok'?'Dobro':i.stanje==='damaged'?'Poškodovano':'Izločeno',
+      i.vrednost||0,
+      i.opombe||''
+    ];
+  });
+  const csv = [headers,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'pgd_evidenca_vse_' + todayStr() + '.csv';
+  a.click();
+}
+
+function exportGasilecCSV(gid) {
+  const g = db.gasilci.find(x=>x.id===gid);
+  const items = db.items.filter(i=>i.gid===gid);
+  const headers = ['Naziv','Model','ID','Datum dodelitve','Poteče','Zadnji pregled','Stanje','Vrednost €','Opombe'];
+  const rows = items.map(i => {
+    const exp = getExpiry(i);
+    return [i.naziv,i.model||'',i.idst||'',i.datum||'',
+      exp?exp.toISOString().split('T')[0]:'',i.pregled||'',
+      i.stanje==='ok'?'Dobro':i.stanje==='damaged'?'Poškodovano':'Izločeno',
+      i.vrednost||0,i.opombe||''];
+  });
+  const csv = [headers,...rows].map(r=>r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'});
+  const a = document.createElement('a'); a.href = URL.createObjectURL(blob);
+  a.download = 'oprema_' + (g?.name||gid).replace(/ /g,'_') + '.csv';
+  a.click();
+}
+
+// ============ UVOZ IZ EXCELA ============
+function loadSheetJS() {
+  if (window.XLSX) return Promise.resolve();
+  return new Promise((res, rej) => {
+    const s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+    s.onload = res;
+    s.onerror = () => rej(new Error('Knjižnice za Excel ni bilo mogoče naložiti – preveri internet.'));
+    document.head.appendChild(s);
+  });
+}
+
+function cellDate(v) {
+  if (v === null || v === undefined || v === '') return '';
+  if (v instanceof Date && !isNaN(v)) {
+    return v.getFullYear() + '-' + String(v.getMonth()+1).padStart(2,'0') + '-' + String(v.getDate()).padStart(2,'0');
+  }
+  const s = String(v).trim();
+  let m;
+  if ((m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return m[1] + '-' + m[2].padStart(2,'0') + '-' + m[3].padStart(2,'0');
+  if ((m = s.match(/^(\d{1,2})\.\s*(\d{1,2})\.\s*(\d{4})/))) return m[3] + '-' + m[2].padStart(2,'0') + '-' + m[1].padStart(2,'0'); // 25. 11. 2022
+  if ((m = s.match(/^(\d{1,2})\/(\d{1,2})\/(\d{4})/))) return m[3] + '-' + m[1].padStart(2,'0') + '-' + m[2].padStart(2,'0');   // 11/25/2022
+  if ((m = s.match(/^(\d{4})$/))) return m[1] + '-01-01';                                                                     // samo leto
+  return '';
+}
+
+function normName(s) { return String(s || '').replace(/\s+/g, ' ').trim().toUpperCase(); }
+
+function parseWorkbook(wb) {
+  const people = [];
+  wb.SheetNames.forEach(sn => {
+    const rows = XLSX.utils.sheet_to_json(wb.Sheets[sn], { header: 1, raw: true, defval: '' });
+    // glava tabele: vrstica s celico "Oprema"
+    let hr = -1, col = {};
+    for (let r = 0; r < Math.min(rows.length, 15) && hr < 0; r++) {
+      rows[r].forEach((v, ci) => {
+        const t = String(v).toLowerCase().replace(/\s+/g, '');
+        if (t === 'oprema') { hr = r; col.naziv = ci; }
+      });
+    }
+    if (hr < 0) return;
+    rows[hr].forEach((v, ci) => {
+      const t = String(v).toLowerCase();
+      if (t.includes('model')) col.model = ci;
+      else if (t.includes('id') || t.includes('števil') || t.includes('stevil')) col.idst = ci;
+      else if (t.includes('leto') || t.includes('datum')) col.datum = ci;
+    });
+    // ime: "Ime Priimek: POŽAR DOMEN" v prvih vrsticah, sicer ime zavihka
+    let name = '';
+    for (let r = 0; r < hr && !name; r++) {
+      rows[r].forEach(v => { const m = String(v).match(/ime\s*(in)?\s*priimek\s*:\s*(.+)/i); if (m && !name) name = m[2]; });
+    }
+    name = normName(name || sn);
+    const items = [];
+    let r = hr + 1;
+    for (; r < rows.length; r++) {
+      const naziv = String(rows[r][col.naziv] || '').trim();
+      if (!naziv) break;
+      if (/datum pregleda|opombe/i.test(naziv)) break;
+      const model = col.model !== undefined ? String(rows[r][col.model] || '').trim() : '';
+      const idst  = col.idst  !== undefined ? String(rows[r][col.idst]  || '').trim() : '';
+      const datum = col.datum !== undefined ? cellDate(rows[r][col.datum]) : '';
+      if (!model && !idst && !datum) continue; // prazna vrstica predloge – oprema ni zadolžena
+      items.push({ naziv, model, idst, datum });
+    }
+    // datum zadnjega pregleda: najnovejši datum v bloku "Datum pregleda opreme"
+    let pregled = '';
+    for (let rr = r; rr < rows.length; rr++) {
+      const first = String(rows[rr][0] || '');
+      if (/opombe/i.test(first)) break;
+      rows[rr].forEach(v => { const d = cellDate(v instanceof Date ? v : (typeof v === 'string' ? v : '')); if (d && d > pregled) pregled = d; });
+    }
+    // opombe: vrstice "1. ...", "2. ..." pod "Opombe o stanju opreme"
+    const notes = [];
+    let inNotes = false;
+    rows.forEach(row => {
+      const first = String(row[0] || '').trim();
+      if (/opombe/i.test(first)) { inNotes = true; return; }
+      if (inNotes) { const t = first.replace(/^\d+\.\s*/, '').trim(); if (t) notes.push(t); }
+    });
+    people.push({ name, items, pregled, notes: notes.join('; ') });
+  });
+  return people;
+}
+
+async function importExcel(e) {
+  const file = e.target.files[0];
+  e.target.value = '';
+  if (!file) return;
+  const msg = document.getElementById('export-msg');
+  msg.style.color = 'var(--muted)';
+  msg.textContent = '⏳ Berem datoteko...';
+  try {
+    await loadSheetJS();
+    const wb = XLSX.read(await file.arrayBuffer(), { cellDates: true });
+    const people = parseWorkbook(wb);
+    if (!people.length) throw new Error('V datoteki ni zavihkov s tabelo »Oprema«.');
+    const existingIds = new Set(db.items.filter(i => i.idst).map(i => String(i.idst)));
+    let newPeople = 0, newItems = 0, skipped = 0;
+    const plan = people.map(p => {
+      const g = db.gasilci.find(x => normName(x.name) === p.name);
+      if (!g) newPeople++;
+      const items = p.items.filter(it => {
+        if (it.idst && existingIds.has(it.idst)) { skipped++; return false; }
+        if (it.idst) existingIds.add(it.idst);
+        newItems++;
+        return true;
+      });
+      return { p, g, items };
+    });
+    msg.textContent = '';
+    showConfirm(`Najdeno: ${sl(people.length, GAS)} (od tega novih: ${newPeople}) in ${sl(newItems, KOS)} opreme za uvoz` +
+      (skipped ? `. Že vnesenih (preskočenih): ${skipped}` : '') + '. Uvozim?', () => {
+      let n = 0;
+      plan.forEach(({ p, g, items }) => {
+        if (!g) { g = { id: 'g' + Date.now() + '_' + (n++), name: p.name }; db.gasilci.push(g); }
+        items.forEach(it => {
+          const prev = [...db.items].reverse().find(i => i.naziv === it.naziv && i.zivljenje);
+          db.items.push(normalizeRow({
+            id: 'i' + Date.now() + '_' + (n++), gid: g.id, naziv: it.naziv, model: it.model, idst: it.idst,
+            datum: it.datum, zivljenje: prev ? prev.zivljenje : 10, pregled: p.pregled, stanje: 'ok', vrednost: 0,
+            opombe: ''
+          }));
+        });
+      });
+      db.gasilci.sort((a, b) => a.name.localeCompare(b.name, 'sl'));
+      saveDB();
+      cloudOp({ action: 'saveAll', data: db });
+      buildTabs();
+      refreshActive();
+      msg.style.color = '#1e8449';
+      msg.textContent = `✅ Uvoženo: ${sl(newItems, KOS)} opreme, novih gasilcev: ${newPeople}. Življenjska doba je nastavljena na 10 let – po potrebi jo popravi.`;
+    });
+  } catch (err) {
+    msg.style.color = 'var(--red)';
+    msg.textContent = '❌ ' + err.message;
+  }
+}
+
+// ============ HITRI POSTOPKI ============
+function setReserveQty(naziv, qty) {
+  if (!db.reserve) db.reserve = {};
+  if (qty > 0) db.reserve[naziv] = qty; else delete db.reserve[naziv];
+  saveDB();
+  cloudOp({ action: 'setReserve', naziv, qty });
+}
+
+function markInspected(id) {
+  const i = db.items.find(x => x.id === id);
+  if (!i) return;
+  i.pregled = todayStr();
+  saveDB();
+  cloudOp({ action: 'upsert', table: 'items', row: i });
+  openDetail(id);
+  refreshActive();
+  showSyncStatus('✔ Pregled zabeležen');
+}
+
+function returnToStock(id) {
+  const i = db.items.find(x => x.id === id);
+  if (!i) return;
+  const g = db.gasilci.find(x => x.id === i.gid);
+  showConfirm('Vrni »' + i.naziv + '« (' + (g ? g.name : '?') + ') v rezervno zalogo? Kos se odstrani iz zadolžitve, zaloga se poveča za 1.', () => {
+    db.items = db.items.filter(x => x.id !== id);
+    saveDB();
+    cloudOp({ action: 'delete', table: 'items', id });
+    setReserveQty(i.naziv, ((db.reserve || {})[i.naziv] || 0) + 1);
+    closeModal('modal-detail');
+    refreshActive();
+  });
+}
+
+function manualScan() {
+  const code = document.getElementById('scan-manual').value.trim();
+  if (!code) return;
+  scanHandled = true;
+  handleScanResult(code);
+}
+
+let renameId = null;
+function openRename(id) {
+  const g = db.gasilci.find(x => x.id === id);
+  if (!g) return;
+  renameId = id;
+  document.getElementById('f-rename').value = g.name;
+  document.getElementById('modal-rename').classList.add('open');
+}
+
+function saveRename() {
+  const name = document.getElementById('f-rename').value.trim().replace(/\s+/g, ' ').toUpperCase();
+  const g = db.gasilci.find(x => x.id === renameId);
+  if (!name || !g) return;
+  if (db.gasilci.some(x => x.name === name && x.id !== renameId)) return alert('Gasilec s tem imenom že obstaja.');
+  g.name = name;
+  db.gasilci.sort((a, b) => a.name.localeCompare(b.name, 'sl'));
+  saveDB();
+  cloudOp({ action: 'upsert', table: 'gasilci', row: g });
+  closeModal('modal-rename');
+  renderGasilecList();
+  refreshActive();
+}
+
+// ============ TISK ZADOLŽITVE ============
+function printZadolzitev(gids) {
+  const pages = gids.map(gid => {
+    const g = db.gasilci.find(x => x.id === gid);
+    if (!g) return '';
+    const items = db.items.filter(i => i.gid === gid && i.stanje !== 'retired');
+    const rows = items.map(i => `<tr><td>${esc(i.naziv)}</td><td>${esc(i.model||'')}</td><td>${esc(i.idst||'')}</td><td>${fmtDate(i.datum)}</td><td>${fmtExpiry(i)}</td><td>${fmtDate(i.pregled)}</td></tr>`).join('')
+      || '<tr><td colspan="6">Ni zadolžene opreme.</td></tr>';
+    return `<div class="print-page">
+      <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px">
+        <h2>Evidenca osebne zadolžene opreme PGD Pivka</h2><span style="font-size:11px">Natisnjeno: ${fmtDate(todayStr())}</span>
+      </div>
+      <p style="font-size:13px;margin:0 0 10px"><b>Ime in priimek:</b> ${esc(g.name)}</p>
+      <table><thead><tr><th>Oprema</th><th>Model</th><th>ID številka</th><th>Dodeljeno</th><th>Poteče</th><th>Zadnji pregled</th></tr></thead><tbody>${rows}</tbody></table>
+      <p style="font-size:11px;margin-top:10px">S podpisom potrjujem, da sem zgoraj navedeno opremo prejel v uporabo in zanjo skrbim kot dober gospodar.</p>
+      <div class="sign-row"><div>Prevzel (podpis)</div><div>Izdal (podpis, žig)</div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('print-area').innerHTML = pages;
+  window.print();
+}
+
+// ============ MODAL HELPERS ============
+function closeModal(id) {
+  if (id === 'modal-scan') { stopScan(); return; }
+  document.getElementById(id).classList.remove('open');
+}
+
+document.addEventListener('click', e => {
+  if (e.target.classList && e.target.classList.contains('modal-overlay')) closeModal(e.target.id);
+});
+
+// ============ INIT ============
+loadDB();
+buildTabs();
+document.querySelector('.nav-tab[data-tab="overview"]').classList.add('active');
+document.getElementById('view-overview').classList.add('active');
+renderOverview();
+if (isCloudEnabled()) {
+  const ov = document.createElement('div');
+  ov.className = 'loading-overlay';
+  ov.textContent = '⏳ Nalagam podatke iz oblaka...';
+  document.body.appendChild(ov);
+  refreshFromCloud().finally(() => ov.remove());
+}
+
+function showConfirm(msg, cb) {
+  document.getElementById('confirm-msg').textContent = msg;
+  window._confirmCb = cb;
+  document.getElementById('modal-confirm').classList.add('open');
+}
+</script>
+
+
+<!-- CLOUD URL MODAL -->
+<div class="modal-overlay" id="modal-url">
+  <div class="modal" style="max-width:480px">
+    <div class="modal-header">
+      <span class="modal-title">☁️ Nastavitev oblaka</span>
+      <button class="modal-close" onclick="closeModal('modal-url')">✕</button>
+    </div>
+    <p style="font-size:13px;color:var(--muted);margin-bottom:14px">Prilepi URL tvojega Google Apps Script-a. Po nastavitvi se podatki samodejno shranjujejo v Google Sheets in so dostopni z vseh naprav.</p>
+    <div class="form-group">
+      <label class="form-label">Apps Script URL</label>
+      <input class="form-control" id="f-script-url" placeholder="https://script.google.com/macros/s/...">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Geslo društva (če je nastavljeno v Apps Script)</label>
+      <input class="form-control" id="f-token" type="password" autocomplete="off" placeholder="neobvezno">
+    </div>
+    <div id="url-status" style="font-size:12px;margin-top:4px;color:var(--muted)"></div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modal-url')">Prekliči</button>
+      <button class="btn btn-primary" onclick="saveScriptUrl()">💾 Shrani & poveži</button>
+    </div>
+  </div>
+</div>
+<!-- RENAME MODAL -->
+<div class="modal-overlay" id="modal-rename">
+  <div class="modal" style="max-width:400px">
+    <div class="modal-header">
+      <span class="modal-title">Preimenuj gasilca</span>
+      <button class="modal-close" onclick="closeModal('modal-rename')">✕</button>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Priimek in ime</label>
+      <input class="form-control" id="f-rename" onkeydown="if(event.key==='Enter')saveRename()">
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modal-rename')">Prekliči</button>
+      <button class="btn btn-primary" onclick="saveRename()">💾 Shrani</button>
+    </div>
+  </div>
+</div>
+<div id="print-area"></div>
+<!-- CONFIRM MODAL -->
+<div class="modal-overlay" id="modal-confirm">
+  <div class="modal" style="max-width:360px">
+    <div class="modal-header">
+      <span class="modal-title">Potrdi dejanje</span>
+    </div>
+    <p id="confirm-msg" style="font-size:14px;margin-bottom:16px;color:var(--text)"></p>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modal-confirm');window._confirmCb=null">Prekliči</button>
+      <button class="btn btn-primary" onclick="if(window._confirmCb){window._confirmCb();window._confirmCb=null;}closeModal('modal-confirm')">Potrdi</button>
+    </div>
+  </div>
+</div>
+</body>
+</html>
